@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Vercel
+.vercel
+.env
+.env.local
+node_modules/
+
+# Virtuelle Umgebungen
+venv/
+ENV/
+env/
+
+# IDE-Dateien
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Ergebnisse und Logs
+*.log
+trends_result.json
+api_trends_result.json 
