@@ -38,12 +38,14 @@ if not os.environ.get("OPENAI_API_KEY"):
 
 # API-Key-Konfiguration
 API_KEY_NAME = "X-API-Key"
+API_KEY_NAME_ALT = "RESEARCH_API_KEY"  # Alternativer Header-Name (für Frontend-Kompatibilität)
 API_KEY = os.environ.get("RESEARCH_API_KEY")
 if not API_KEY:
     print("WARNUNG: RESEARCH_API_KEY ist nicht gesetzt. Verwende Standardschlüssel 'test-api-key'")
     API_KEY = "test-api-key"  # Standardschlüssel für Entwicklung
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+api_key_header_alt = APIKeyHeader(name=API_KEY_NAME_ALT, auto_error=False)
 
 # Erstelle die FastAPI-Anwendung
 app = FastAPI(
@@ -67,19 +69,23 @@ research_manager = AsyncResearchManager()
 # Dependency für API-Key-Validierung
 async def get_api_key(
     api_key: str = Header(None, alias=API_KEY_NAME),
+    api_key_alt: str = Header(None, alias=API_KEY_NAME_ALT),
     request: Request = None
 ):
-    if api_key is None:
+    # Unterstütze beide Header-Namen
+    used_key = api_key or api_key_alt
+    
+    if used_key is None:
         raise HTTPException(
             status_code=401,
-            detail="API-Key fehlt. Bitte füge den Header 'X-API-Key' hinzu."
+            detail=f"API-Key fehlt. Bitte füge den Header '{API_KEY_NAME}' oder '{API_KEY_NAME_ALT}' hinzu."
         )
-    if api_key != API_KEY:
+    if used_key != API_KEY:
         raise HTTPException(
             status_code=403,
             detail="Ungültiger API-Key"
         )
-    return api_key
+    return used_key
 
 
 @app.get("/")
@@ -90,7 +96,7 @@ async def root():
         "version": "1.0.0",
         "documentation": "/docs",
         "modes": ["report", "trends"],
-        "auth": "API-Key erforderlich (X-API-Key Header)"
+        "auth": f"API-Key erforderlich ('{API_KEY_NAME}' oder '{API_KEY_NAME_ALT}' Header)"
     }
 
 
