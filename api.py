@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Depends, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security.api_key import APIKeyHeader
-from typing import Optional
+from typing import Optional, List
 from dotenv import load_dotenv
 
 # Lade Umgebungsvariablen aus .env-Datei
@@ -47,6 +47,20 @@ if not API_KEY:
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 api_key_header_alt = APIKeyHeader(name=API_KEY_NAME_ALT, auto_error=False)
 
+# CORS-Konfiguration
+allowed_origins = [
+    "https://stefanai.de",           # Hauptdomain
+    "https://researchapi.stefanai.de",  # API-Subdomain selbst
+    "https://app.stefanai.de",       # App-Subdomain
+    "https://www.stefanai.de",       # WWW-Subdomain
+    "https://ideas.stefanai.de",     # Ideas-Subdomain (falls vorhanden)
+    "https://ideas-generator.stefanai.de", # Möglicherweise andere Subdomain
+    "https://dev.stefanai.de",       # Dev-Subdomain
+    "http://localhost:3000",         # Lokale Entwicklung für Frontend
+    "http://localhost:8000",         # Lokale Entwicklung für Backend
+    "*"                              # Alles andere (Fallback)
+]
+
 # Erstelle die FastAPI-Anwendung
 app = FastAPI(
     title="Research Bot API",
@@ -57,7 +71,7 @@ app = FastAPI(
 # Füge CORS-Middleware hinzu
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In Produktion solltest du spezifische Domains erlauben
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
