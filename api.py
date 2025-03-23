@@ -53,12 +53,12 @@ allowed_origins = [
     "https://researchapi.stefanai.de",  # API-Subdomain selbst
     "https://app.stefanai.de",       # App-Subdomain
     "https://www.stefanai.de",       # WWW-Subdomain
+    "https://mrcomment.stefanai.de", # MrComment-Subdomain hinzugefügt
     "https://ideas.stefanai.de",     # Ideas-Subdomain (falls vorhanden)
     "https://ideas-generator.stefanai.de", # Möglicherweise andere Subdomain
     "https://dev.stefanai.de",       # Dev-Subdomain
     "http://localhost:3000",         # Lokale Entwicklung für Frontend
     "http://localhost:8000",         # Lokale Entwicklung für Backend
-    "*"                              # Alles andere (Fallback)
 ]
 
 # Erstelle die FastAPI-Anwendung
@@ -88,6 +88,11 @@ async def get_api_key(
 ):
     # Unterstütze beide Header-Namen
     used_key = api_key or api_key_alt
+    
+    # Debug-Information
+    print(f"API-Key-Anfrage von: {request.client.host if request and request.client else 'unbekannt'}")
+    print(f"Verwendeter Header: {API_KEY_NAME if api_key else (API_KEY_NAME_ALT if api_key_alt else 'keiner')}")
+    print(f"Erster Buchstabe des Keys: {used_key[0] if used_key else 'N/A'}")
     
     if used_key is None:
         raise HTTPException(
